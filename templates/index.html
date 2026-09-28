@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>TECH BOT</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;color:#f4f7ff;font-family:Inter,system-ui,sans-serif;background:radial-gradient(circle at 15% 15%,rgba(0,212,255,.14),transparent 28%),radial-gradient(circle at 85% 85%,rgba(120,103,255,.17),transparent 30%),#070b13}.shell{width:min(1100px,100%);height:min(90vh,760px);display:grid;grid-template-columns:290px 1fr;overflow:hidden;border:1px solid rgba(255,255,255,.09);border-radius:30px;background:rgba(14,21,34,.88);backdrop-filter:blur(22px);box-shadow:0 30px 100px #0008}.sidebar{padding:28px 22px;border-right:1px solid #ffffff17;background:#04080f6b}.logo-row{display:flex;align-items:center;gap:12px;margin-bottom:38px}.logo{width:48px;height:48px;display:grid;place-items:center;border-radius:16px;font-weight:900;color:#061018;background:linear-gradient(135deg,#00d4ff,#7867ff)}.logo-row h1{font-size:19px;letter-spacing:1px}.logo-row p,.subtitle{color:#8995ad;font-size:11px;margin-top:3px}.card{padding:18px;border:1px solid #ffffff17;border-radius:19px;background:#ffffff0b}.card-title{margin-bottom:9px;font-size:13px;font-weight:700}.card-text,.topics{color:#8995ad;font-size:12px;line-height:1.6}.topics{margin-top:22px;line-height:2}.topics strong{color:#f4f7ff}.main{min-width:0;display:flex;flex-direction:column}.topbar{min-height:82px;display:flex;align-items:center;justify-content:space-between;padding:18px 26px;border-bottom:1px solid #ffffff17}.title{font-size:16px;font-weight:750}.online{display:flex;align-items:center;gap:8px;color:#8995ad;font-size:11px}.online-dot{width:8px;height:8px;border-radius:50%;background:#46e88a;box-shadow:0 0 13px #46e88a}#messages{flex:1;overflow-y:auto;padding:28px}.message{display:flex;margin-bottom:17px}.message.user{justify-content:flex-end}.bubble{max-width:min(78%,680px);padding:14px 17px;border-radius:18px;font-size:14px;line-height:1.6;white-space:pre-wrap}.message.bot .bubble{border:1px solid #ffffff17;border-top-left-radius:6px;background:#131b2be6}.message.user .bubble{border-top-right-radius:6px;background:linear-gradient(135deg,#147e9d,#6657e8)}.composer{padding:18px 22px 22px;border-top:1px solid #ffffff17}.input-box{display:flex;align-items:flex-end;gap:10px;padding:8px 8px 8px 17px;border:1px solid #ffffff17;border-radius:20px;background:#ffffff0b}textarea{flex:1;min-height:42px;max-height:120px;padding:10px 0;resize:none;outline:0;border:0;color:#f4f7ff;background:transparent;font:inherit}textarea::placeholder{color:#66728a}#send{width:44px;height:44px;border:0;border-radius:14px;cursor:pointer;color:#fff;font-size:18px;background:linear-gradient(135deg,#00d4ff,#7867ff)}#send:disabled{cursor:wait;opacity:.5}.hint{margin-top:9px;text-align:center;color:#5e6a82;font-size:10px}@media(max-width:760px){body{padding:0}.shell{height:100vh;border-radius:0;grid-template-columns:1fr}.sidebar{display:none}#messages{padding:20px 15px}.bubble{max-width:88%}}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+<div class="logo-row"><div class="logo">&lt;/&gt;</div><div><h1>TECH BOT</h1><p>Study-focused AI assistant</p></div></div>
+<div class="card"><div class="card-title">Study Mode</div><div class="card-text">Ask academic questions about technology, computer science, software, hardware, networking, AI, databases and related technical subjects.</div></div>
+<div class="topics"><strong>Example questions</strong><br>• What is an operating system?<br>• Explain TCP/IP<br>• What is machine learning?<br>• Explain DBMS normalization<br>• What is cloud computing?</div>
+</aside>
+<main class="main">
+<header class="topbar"><div><div class="title">TECH BOT</div><div class="subtitle">Gemini-powered technical learning assistant</div></div><div class="online"><span class="online-dot"></span>Online</div></header>
+<section id="messages"><div class="message bot"><div class="bubble">Hi! I'm TECH BOT 👋
+Ask me a study question related to technology or computer science.</div></div></section>
+<form class="composer" id="chat-form"><div class="input-box"><textarea id="message" rows="1" placeholder="Ask a technical study question..." autocomplete="off"></textarea><button id="send" type="submit">➤</button></div><div class="hint">TECH BOT only answers questions within its configured study domain.</div></form>
+</main></div>
+<script>
+const form=document.getElementById("chat-form"),input=document.getElementById("message"),messages=document.getElementById("messages"),send=document.getElementById("send");
+function addMessage(text,type){const m=document.createElement("div");m.className=`message ${type}`;const b=document.createElement("div");b.className="bubble";b.textContent=text;m.appendChild(b);messages.appendChild(m);messages.scrollTop=messages.scrollHeight}
+input.addEventListener("input",()=>{input.style.height="auto";input.style.height=Math.min(input.scrollHeight,120)+"px"});
+input.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();form.requestSubmit()}});
+form.addEventListener("submit",async e=>{e.preventDefault();const message=input.value.trim();if(!message||send.disabled)return;addMessage(message,"user");input.value="";input.style.height="auto";send.disabled=true;const t=document.createElement("div");t.className="message bot";t.innerHTML='<div class="bubble">Thinking…</div>';messages.appendChild(t);messages.scrollTop=messages.scrollHeight;try{const r=await fetch("/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message})});const d=await r.json();t.remove();addMessage(d.reply||d.error||"Something went wrong.","bot")}catch{t.remove();addMessage("Unable to connect to the server.","bot")}finally{send.disabled=false;input.focus()}});
+</script>
+</body>
+</html>
